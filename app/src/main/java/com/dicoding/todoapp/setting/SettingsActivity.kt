@@ -5,9 +5,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.dicoding.todoapp.R
+import com.dicoding.todoapp.notification.NotificationWorker
+import com.dicoding.todoapp.utils.NOTIFICATION_CHANNEL_ID
 
 class SettingsActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +28,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {
+        private lateinit var workManager: WorkManager
+
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
@@ -29,6 +37,22 @@ class SettingsActivity : AppCompatActivity() {
             prefNotification?.setOnPreferenceChangeListener { preference, newValue ->
                 val channelName = getString(R.string.notify_channel_name)
                 //TODO 13 : Schedule and cancel daily reminder using WorkManager with data channelName
+                workManager = WorkManager.getInstance(requireContext())
+
+                if (newValue as Boolean) {
+                    val data = Data.Builder()
+                        .putString(NOTIFICATION_CHANNEL_ID, channelName)
+                        .build()
+
+                    val oneTimeWorkRequest =
+                        OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                            .setInputData(data)
+                            .build()
+
+                    workManager.enqueue(oneTimeWorkRequest)
+                }
+
+
                 true
             }
 

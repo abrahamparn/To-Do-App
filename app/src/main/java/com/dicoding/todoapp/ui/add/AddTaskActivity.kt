@@ -6,17 +6,28 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.dicoding.todoapp.R
+import com.dicoding.todoapp.data.Task
+import com.dicoding.todoapp.databinding.ActivityAddTaskBinding
+import com.dicoding.todoapp.ui.ViewModelFactory
+import com.dicoding.todoapp.ui.detail.DetailTaskViewModel
+import com.dicoding.todoapp.utils.DateConverter
 import com.dicoding.todoapp.utils.DatePickerFragment
+import com.dicoding.todoapp.utils.TASK_ID
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener {
     private var dueDateMillis: Long = System.currentTimeMillis()
+    private lateinit var binding: ActivityAddTaskBinding
+    private lateinit var viewModel: AddTaskViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_task)
+        binding = ActivityAddTaskBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         supportActionBar?.title = getString(R.string.add_task)
 
@@ -31,10 +42,28 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
         return when (item.itemId) {
             R.id.action_save -> {
                 //TODO 12 : Create AddTaskViewModel and insert new task to database
+                setupModel()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    //FOR TO DO 12
+    private fun setupModel() {
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelFactory.getInstance(this)
+        )[AddTaskViewModel::class.java]
+
+        val task = Task(0,
+            binding.addEdTitle.text.toString().trim(),
+            binding.addEdDescription.text.toString().trim(),
+            dueDateMillis,
+            false)
+
+        viewModel.addTask(task)
+        onBackPressed()
     }
 
     fun showDatePicker(view: View) {
