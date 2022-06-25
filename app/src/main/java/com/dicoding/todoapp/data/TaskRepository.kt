@@ -30,6 +30,7 @@ class TaskRepository(private val tasksDao: TaskDao) {
 
     //TODO 4 : Use FilterUtils.getFilteredQuery to create filterable query
     //TODO 5 : Build PagedList with configuration
+    //https://www.dicoding.com/academies/352/tutorials/22532
     fun getTasks(filter: TasksFilterType): LiveData<PagedList<Task>> {
         val query = FilterUtils.getFilteredQuery(filter)
         val source = tasksDao.getTasks(query)

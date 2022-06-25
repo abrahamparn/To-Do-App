@@ -41,9 +41,9 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
     override fun doWork(): Result {
         //TODO 14 : If notification preference on, get nearest active task from repository and show notification with pending intent
+        //https://www.dicoding.com/academies/14/tutorials/1081
 
         val mNotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         val textRepository = TaskRepository.getInstance(applicationContext).getNearestActiveTask()
         val pendingIntent = getPendingIntent(textRepository)
         val contentTitle = textRepository.title
@@ -51,11 +51,11 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             R.string.notify_content,
             DateConverter.convertMillisToString(textRepository.dueDateMillis)
         )
-
+        val smallIcon = R.drawable.ic_notifications
         val mBuilder =
             NotificationCompat.Builder(applicationContext, CHANNEL_ID)
                 .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.ic_notifications)
+                .setSmallIcon(smallIcon)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

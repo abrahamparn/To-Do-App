@@ -1,7 +1,6 @@
 package com.dicoding.todoapp.data
 
 import android.content.Context
-import android.provider.ContactsContract
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -13,6 +12,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 //TODO 3 : Define room database class and prepopulate database using JSON
@@ -32,18 +32,23 @@ abstract class TaskDatabase : RoomDatabase() {
                     context.applicationContext,
                     TaskDatabase::class.java,
                     "task.db"
-                )  .addCallback(object : RoomDatabase.Callback() {
+                )
+                    .allowMainThreadQueries()
+                    .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
 
+                        //https://www.dicoding.com/academies/14/tutorials/159
+                        //https://www.dicoding.com/academies/352/tutorials/22502
+
+                        val executor: ExecutorService = Executors.newCachedThreadPool()
+
                         //THIS IS THE THING I CHOOSE newCachedThreadPool instead of newSingleThreadExecutor
-                        Executors.newCachedThreadPool().execute {
+                        executor.execute {
                             fillWithStartingData(context, getInstance(context).taskDao())
                         }
                     }
-                })
-
-                    .build()
+                }).build()
                 INSTANCE = instance
                 instance
             }

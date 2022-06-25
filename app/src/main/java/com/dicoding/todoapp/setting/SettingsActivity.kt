@@ -37,12 +37,14 @@ class SettingsActivity : AppCompatActivity() {
             prefNotification?.setOnPreferenceChangeListener { preference, newValue ->
                 val channelName = getString(R.string.notify_channel_name)
                 //TODO 13 : Schedule and cancel daily reminder using WorkManager with data channelName
+                //https://www.dicoding.com/academies/14/tutorials/5632
                 workManager = WorkManager.getInstance(requireContext())
 
                 if (newValue as Boolean) {
-                    val data = Data.Builder()
-                        .putString(NOTIFICATION_CHANNEL_ID, channelName)
-                        .build()
+                    val data =
+                        Data.Builder()
+                            .putString(NOTIFICATION_CHANNEL_ID, channelName)
+                            .build()
 
                     val oneTimeWorkRequest =
                         OneTimeWorkRequest.Builder(NotificationWorker::class.java)
@@ -51,7 +53,6 @@ class SettingsActivity : AppCompatActivity() {
 
                     workManager.enqueue(oneTimeWorkRequest)
                 }
-
 
                 true
             }

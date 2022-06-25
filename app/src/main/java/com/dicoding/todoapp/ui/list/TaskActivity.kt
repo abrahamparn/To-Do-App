@@ -23,6 +23,7 @@ import com.dicoding.todoapp.utils.Event
 import com.dicoding.todoapp.utils.TasksFilterType
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.NonCancellable.isCompleted
 
 class TaskActivity : AppCompatActivity() {
 
@@ -53,16 +54,16 @@ class TaskActivity : AppCompatActivity() {
         taskViewModel.tasks.observe(this, Observer(this::showRecyclerView))
 
         //TODO 15 : Fixing bug : snackBar not show when task completed
-        taskViewModel.snackbarText.observe(this){
-            showSnackBar(it)
-        }
+
+
+        taskViewModel.snackbarText.observe(this, Observer(this::showSnackBar))
 
     }
 
     private fun showRecyclerView(task: PagedList<Task>) {
         //TODO 7 : Submit pagedList to adapter and update database when onCheckChange
-        val adapter = TaskAdapter{ task, isCompleted ->
-            taskViewModel.completeTask(task,isCompleted)
+        val adapter = TaskAdapter{ task, completed ->
+            taskViewModel.completeTask(task, completed)
         }
         recycler.adapter = adapter
         adapter.submitList(task)
